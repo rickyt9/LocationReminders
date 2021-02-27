@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import androidx.databinding.DataBindingUtil
+import com.firebase.ui.auth.AuthUI
 import com.udacity.project4.R
 import com.udacity.project4.authentication.AuthenticationActivity
 import com.udacity.project4.base.BaseFragment
@@ -20,12 +21,12 @@ class ReminderListFragment : BaseFragment() {
     private lateinit var binding: FragmentRemindersBinding
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(
                 inflater, R.layout.fragment_reminders, container, false
-            )
+        )
         binding.viewModel = _viewModel
 
         setHasOptionsMenu(true)
@@ -55,9 +56,9 @@ class ReminderListFragment : BaseFragment() {
     private fun navigateToAddReminder() {
         //use the navigationCommand live data to navigate between the fragments
         _viewModel.navigationCommand.postValue(
-            NavigationCommand.To(
-                ReminderListFragmentDirections.toSaveReminder()
-            )
+                NavigationCommand.To(
+                        ReminderListFragmentDirections.toSaveReminder()
+                )
         )
     }
 
@@ -72,12 +73,16 @@ class ReminderListFragment : BaseFragment() {
         when (item.itemId) {
             R.id.logout -> {
 //                TODO: add the logout implementation
-                val intent = Intent(requireActivity(), AuthenticationActivity::class.java)
-                startActivity(intent)
+                AuthUI.getInstance().signOut(requireActivity())
+                        .addOnCompleteListener {
+                            if (it.isSuccessful) {
+                                val intent = Intent(requireActivity(), AuthenticationActivity::class.java)
+                                startActivity(intent)
+                            }
+                        }
             }
         }
         return super.onOptionsItemSelected(item)
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

@@ -24,8 +24,12 @@ class AuthenticationActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding = DataBindingUtil.setContentView<ActivityAuthenticationBinding>(this, R.layout.activity_authentication)
 
+        if (FirebaseAuth.getInstance().currentUser != null) {
+            startRemindersActivity()
+        }
+
+        val binding = DataBindingUtil.setContentView<ActivityAuthenticationBinding>(this, R.layout.activity_authentication)
         binding.loginButton.setOnClickListener { launchSignInFlow() }
 
 //          TODO: a bonus is to customize the sign in flow to look nice using :
@@ -39,9 +43,9 @@ class AuthenticationActivity : AppCompatActivity() {
         if (requestCode == SIGN_IN_REQUEST_CODE) {
             val response = IdpResponse.fromResultIntent(data)
             if (resultCode == Activity.RESULT_OK) {
+                // We have signed in the user or we have a new user
                 Log.i(TAG, "Successfully signed in user ${FirebaseAuth.getInstance().currentUser?.displayName}")
-                val intent = Intent(this, RemindersActivity::class.java)
-                startActivity(intent)
+                startRemindersActivity()
             } else {
                 Log.i(TAG, "Sign in unsuccessful ${response?.error?.errorCode}")
             }
@@ -49,7 +53,6 @@ class AuthenticationActivity : AppCompatActivity() {
     }
 
     private fun launchSignInFlow() {
-
         // TODO: Implement the create account and sign in using FirebaseUI, use sign in using email and sign in using Google
         val providers = arrayListOf(
                 AuthUI.IdpConfig.EmailBuilder().build(),
@@ -62,6 +65,12 @@ class AuthenticationActivity : AppCompatActivity() {
                 .build()
 
         startActivityForResult(signInIntent, SIGN_IN_REQUEST_CODE)
+    }
+
+    private fun startRemindersActivity() {
+        val intent = Intent(this, RemindersActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
 }

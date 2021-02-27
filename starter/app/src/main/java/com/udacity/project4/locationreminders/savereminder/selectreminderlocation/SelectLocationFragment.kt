@@ -3,6 +3,7 @@ package com.udacity.project4.locationreminders.savereminder.selectreminderlocati
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.location.Location
 import android.os.Bundle
 import android.os.Looper
@@ -139,6 +140,7 @@ class SelectLocationFragment : BaseFragment(),
         // TODO: add style to the map
         map.mapType = GoogleMap.MAP_TYPE_NORMAL
         setPoiClick(map)
+        setMapStyle(map)
         enableMyLocation()
     }
 
@@ -155,6 +157,19 @@ class SelectLocationFragment : BaseFragment(),
                             .title(poi.name)
             )
             selectedPoiMarker!!.showInfoWindow()
+        }
+    }
+
+    private fun setMapStyle(map: GoogleMap) {
+        try {
+            val success = map.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(requireActivity(), R.raw.map_style)
+            )
+            if (!success) {
+                Log.i(TAG, "Style parsing failed")
+            }
+        } catch (e: Resources.NotFoundException) {
+            Log.i(TAG, "Can't find style. Error: ", e)
         }
     }
 
